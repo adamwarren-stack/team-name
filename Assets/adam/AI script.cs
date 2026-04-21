@@ -1,11 +1,14 @@
+using UnityEngine.AI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class FieldOfView : MonoBehaviour
+public class AI : MonoBehaviour
 {
-    public float radius;
+    NavMeshAgent agent;
+    public float Deg;
+
+        public float radius;
     [Range(0,360)]
     public float angle;
 
@@ -16,24 +19,30 @@ public class FieldOfView : MonoBehaviour
 
     public bool canSeePlayer;
 
-    private void Start()
+
+     void Start()
     {
-        playerRef = GameObject.FindGameObjectWithTag("Player");
+        agent = gameObject.GetComponent<NavMeshAgent>();
         StartCoroutine(FOVRoutine());
-    }
 
-    private IEnumerator FOVRoutine()
+    }
+    
+    void Update()
     {
-        WaitForSeconds wait = new WaitForSeconds(0.2f);
-
-        while (true)
-        {
-            yield return wait;
-            FieldOfViewCheck();
-        }
+        /*Vector3 dir = playerRef.transform.position - transform.position;
+       if(Mathf.Abs(Vector3.Angle(transform.forward, dir)) <Deg && canSeePlayer)
+       {
+        agent.SetDestination(playerRef.transform.position);
+       }*/
+       if(canSeePlayer){
+        agent.SetDestination(playerRef.transform.position);
+       }
+       else{
+        agent.SetDestination(this.gameObject.transform.position);
+       }
     }
 
-    private void FieldOfViewCheck()
+     private void FieldOfViewCheck()
     {
         Collider[] rangeChecks = Physics.OverlapSphere(transform.position, radius, targetMask);
 
@@ -47,9 +56,14 @@ public class FieldOfView : MonoBehaviour
                 float distanceToTarget = Vector3.Distance(transform.position, target.position);
 
                 if (!Physics.Raycast(transform.position, directionToTarget, distanceToTarget, obstructionMask))
+                {
                     canSeePlayer = true;
+
+                }
                 else
+                {
                     canSeePlayer = false;
+                }
             }
             else
                 canSeePlayer = false;
@@ -57,4 +71,16 @@ public class FieldOfView : MonoBehaviour
         else if (canSeePlayer)
             canSeePlayer = false;
     }
+
+     private IEnumerator FOVRoutine()
+    {
+        WaitForSeconds wait = new WaitForSeconds(0.2f);
+
+        while (true)
+        {
+            yield return wait;
+            FieldOfViewCheck();
+        }
+    }
+
 }

@@ -9,7 +9,7 @@ public class AsyncSceneLoading : MonoBehaviour
     public Image LoadingBarFill;
     public GameObject LoadingScreen;
     public string[] scene_name;
-    public void OnTriggerEnter(Collider other)
+    public virtual void OnTriggerEnter(Collider other)
     {
         if(other.CompareTag("Player"))
         {
